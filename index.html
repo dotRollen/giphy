@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Page Title</title>
+    <title>Giphy App</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link 
         rel="stylesheet" 
@@ -26,17 +26,20 @@
                         Dynamic Giphys
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown" id="new-giphy">
-                        <a class="dropdown-item" href="#">Action</a>
                     </div>
                 </li>
             </ul>
-            <form class="form-inline my-2 my-lg-0">
-            <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
-            <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+            <form class="form-inline my-2 my-lg-0" id="add-giphy">
+                <input class="form-control mr-sm-2" type="text" placeholder="Keywords" id="keyword-input">
+                <button class="btn btn-outline-info my-2 my-sm-0" type="submit">Submit</button>
             </form>
         </div>
     </nav>
     <div class="contianer">
+        <div class="row">
+            <div class="col-sm-12" id="alert">
+            </div>
+        </div>
     </div>
 </body>
 <script 
@@ -50,10 +53,6 @@
 <script 
     src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" 
     integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" 
-    crossorigin="anonymous"></script>
-<script
-    src="http://code.jquery.com/jquery-3.3.1.min.js"
-    integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
     crossorigin="anonymous"></script>
 <script src="assets/javascript/main.js"></script>
 </html>
