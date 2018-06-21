@@ -1,22 +1,24 @@
 const app = {
-    'url': 'https://api.giphy.com/v1/gifs/search',
+    'url': 'https://api.giphy.com/v1/gifs/',
     'apiKey': 'UriJDI0sExlg14EoS5tPvZjUA5SkbnYh',
     'topics': [
         "Synthwave", "Alternative Rock", "Classic Rock", "Punk Rock", 
-        "Lo-Fi HipHop"
+        "Gorillaz"
     ],
-    buildImage: function (keyword, rating, url) {
+    buildImage: function (id, rating, url) {
         var  wrapperDiv = $('<div>').attr({
-                                            "class": 'col-3',
-                                        }), 
+                                "class": 'col-3 col-md-4 col-sm-6 col-xs-12',
+                            }), 
             card = $('<div>').attr({
                                     'class': 'card',
                                     'style': 'width: 18rem;',
                                 }),
             img = $('<img>').attr({
-                                    'class': 'card-img-top',
+                                    'class': 'giphy-img card-img-top',
                                     'src': url,
-                                    'alt': keyword,
+                                    'id': id,
+                                    'alt': id,
+                                    'data-value': 'not-still'
                                 }),
             cardBody = $('<div>').attr({
                                         'class': 'card-body',
@@ -100,32 +102,63 @@ $("#add-giphy").submit(function(event) {
     }
 });
 
-//Even listener for when a giph-link is clicked
-$(".giphy-link").on("click", function(event){
+//Event listener for when a giph-link is clicked
+$("body").on("click", ".giphy-link", function(event){
     event.preventDefault();
     
     var url = app.url,
         keyword = $(this).text();
 
-    url += '?' + $.param({
+    url += 'search?' + $.param({
         'api_key': app.apiKey,
         'q': keyword,
-        'limit': '10',
+        'limit': '12',
         'rating': 'PG-13',
     })
 
     $.ajax({
-        url: url,
-        method: 'GET',
+        'url': url,
+        'method': 'GET',
     }).done(function(results) {
+        // console.log(results.type.gif);
         var data = results.data;
-        $("#images").empty();
+        $("#giphy-images").empty();
         data.forEach(function(element){
-            var rating = element['rating'],
-                imgURL = element.images.downsized_medium.url;
-            $("#images").append(app.buildImage(keyword, rating, imgURL));
+            var id = element['id'],
+                rating = element['rating'],
+                imgURL = element.images.fixed_height.url;
+            $("#giphy-images").append(app.buildImage(id, rating, imgURL));
         })
     }).fail(function(err) {
         throw err;
     });
+});
+
+//Event listener for when a user clicks on the image. Image pause/unpause
+$("body").on("click", ".giphy-img", function(event){
+    var img = $(this),
+        id = img.attr("id"),
+        url = app.url;
+    
+    url += id + '?' + $.param({'api_key': app.apiKey});
+
+    $.ajax({
+        'url': url,
+        'method': 'GET',
+    }).done(function(results) {
+        var images = results.data.images,
+            still = images.fixed_height_still.url,
+            notStill = images.fixed_height.url;
+        if(img.attr("data-value") == "not-still") {
+            img.attr({
+                "src": still,
+                "data-value": "still",
+            });
+        } else {
+            img.attr({
+                "src": notStill,
+                "data-value": "not-still",
+            });
+        }
+    })
 });
