@@ -1,38 +1,63 @@
 const app = {
-    'url': 'https://api.giphy.com/v1/gifs/search?',
+    'url': 'https://api.giphy.com/v1/gifs/search',
     'apiKey': 'UriJDI0sExlg14EoS5tPvZjUA5SkbnYh',
     'topics': [
         "Synthwave", "Alternative Rock", "Classic Rock", "Punk Rock", 
         "Lo-Fi HipHop"
     ],
-    'alertHTML': {
-        'alertDiv': $('<div>').attr({
+    buildImage: function (keyword, rating, url) {
+        var  wrapperDiv = $('<div>').attr({
+                                            "class": 'col-3',
+                                        }), 
+            card = $('<div>').attr({
+                                    'class': 'card',
+                                    'style': 'width: 18rem;',
+                                }),
+            img = $('<img>').attr({
+                                    'class': 'card-img-top',
+                                    'src': url,
+                                    'alt': keyword,
+                                }),
+            cardBody = $('<div>').attr({
+                                        'class': 'card-body',
+                                    }),
+            cardText = $('<p>').addClass('card-text').html(
+                                                '<strong>Rating: </strong>' + 
+                                                rating.toUpperCase()
+                                            );
+        wrapperDiv.append(card.append(img).append(cardBody.append(cardText)));
+        return wrapperDiv;
+    },
+    buildAlert: function (keyword) {
+        var alertDiv = $('<div>').attr({
                                 "class": `alert alert-dismissible fade show`,
                                 "role": "alert",
                             }),
-        'alertButton': $('<button>').attr({
-                                    "type": "button",
-                                    "class": "close",
-                                    "data-dismiss": "alert",
-                                    "aria-label": "Close",
-                                }),
-        'alertSpan': $('<span>').attr({
-                                    "aria-hidden": "true",
-                                }).append("&times;"),
+            alertBtn = $('<button>').attr({
+                                            "type": "button",
+                                            "class": "close",
+                                            "data-dismiss": "alert",
+                                            "aria-label": "Close",
+                                        }),
+            alertSpan = $('<span>').attr({
+                                        "aria-hidden": "true",
+                                    }).html("&times;");
+        alertBtn.append(alertSpan);
+        alertDiv.append(alertBtn);
+        return alertDiv;
     },
-    succAlert: function (keyword) {
-        app.alertHTML.alertButton.append(app.alertSpan);
+    flashAlert: function (keyword) {
+        var alert = app.buildAlert(keyword);
         if (!app.checkGiphyExist(keyword)) {
-            app.alertHTML.alertDiv.html("<strong>" + keyword + `</strong> has 
+           alert.prepend("<strong>" + keyword + `</strong> has 
             been added to the <strong>Dyanmic Giphys</strong> drop down menu.    
             `).addClass("alert-success");
         } else {
-            app.alertHTML.alertDiv.html("<strong>" + keyword + `</strong> has 
+            alert.prepend("<strong>" + keyword + `</strong> has 
             already been added, please try another keyword!
             `).addClass("alert-danger");
         }
-        app.alertHTML.alertDiv.append(app.alertHTML.alertButton);
-        $("#alert").append(app.alertHTML.alertDiv);
+        $("#alert").append(alert);
         setTimeout(app.closeAlert, 4000);
     },
     closeAlert: function () {
@@ -49,6 +74,7 @@ const app = {
     }
 }
 
+//Build links for default topics
 app.topics.forEach(function(element) {
     var ghtml = `<li class="nav-item">
                     <a class="giphy-link nav-link" href="#">` + element + `</a>
@@ -56,6 +82,7 @@ app.topics.forEach(function(element) {
     $("#giphy-buttons").prepend(ghtml);
 });
 
+//Build links in the drop down menu for new topics entered by the user in search
 $("#add-giphy").submit(function(event) {
     event.preventDefault()
     var keyword = $("#keyword-input").val().trim(),
@@ -63,28 +90,41 @@ $("#add-giphy").submit(function(event) {
                             "href": "#",
                             "class": "giphy-link dropdown-item",
                         });
-    app.succAlert(keyword);
-    if (!app.checkGiphyExist(keyword)) {
-        aKeyword.text(keyword);
-        $("#new-giphy").append(aKeyword);
-        $("#keyword-input").val("");
-    };
+    if(keyword != ""){
+        app.flashAlert(keyword);
+        if (!app.checkGiphyExist(keyword)) {
+            aKeyword.text(keyword);
+            $("#new-giphy").append(aKeyword);
+            $("#keyword-input").val("");
+        };
+    }
 });
 
-$(".giphy-link").on("click", function(){
+//Even listener for when a giph-link is clicked
+$(".giphy-link").on("click", function(event){
+    event.preventDefault();
+    
+    var url = app.url,
+        keyword = $(this).text();
 
     url += '?' + $.param({
         'api_key': app.apiKey,
-        'q': '',
+        'q': keyword,
         'limit': '10',
         'rating': 'PG-13',
     })
 
     $.ajax({
-        url: app.url,
+        url: url,
         method: 'GET',
-    }).done(function(result) {
-        console.log(result);
+    }).done(function(results) {
+        var data = results.data;
+        $("#images").empty();
+        data.forEach(function(element){
+            var rating = element['rating'],
+                imgURL = element.images.downsized_medium.url;
+            $("#images").append(app.buildImage(keyword, rating, imgURL));
+        })
     }).fail(function(err) {
         throw err;
     });
