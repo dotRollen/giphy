@@ -43,7 +43,7 @@ const app = {
         );
         return wrapperDiv;
     },
-    buildAlert: function (keyword) {
+    buildAlert: function () {
         var alertDiv = $('<div>').attr({
                                 "class": `alert alert-dismissible fade show`,
                                 "role": "alert",
