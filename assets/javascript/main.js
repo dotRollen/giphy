@@ -5,9 +5,9 @@ const app = {
         "Synthwave", "Alternative Rock", "Classic Rock", "Punk Rock", 
         "Gorillaz"
     ],
-    buildImage: function (id, rating, url) {
+    buildImage: function (obj) {
         var  wrapperDiv = $('<div>').attr({
-                                "class": 'col-3 col-md-4 col-sm-6 col-xs-12',
+                                "class": 'col-lg-4 col-md-6 col-sm-6 col-xs-12',
                             }), 
             card = $('<div>').attr({
                                     'class': 'card',
@@ -15,19 +15,32 @@ const app = {
                                 }),
             img = $('<img>').attr({
                                     'class': 'giphy-img card-img-top',
-                                    'src': url,
-                                    'id': id,
-                                    'alt': id,
-                                    'data-value': 'not-still'
+                                    'src': obj.imgURLStill,
+                                    'id': obj.id,
+                                    'alt': obj.id,
+                                    'data-value': 'still'
                                 }),
             cardBody = $('<div>').attr({
                                         'class': 'card-body',
                                     }),
             cardText = $('<p>').addClass('card-text').html(
-                                                '<strong>Rating: </strong>' + 
-                                                rating.toUpperCase()
-                                            );
-        wrapperDiv.append(card.append(img).append(cardBody.append(cardText)));
+                                            '<p><strong>Title: </strong>' +
+                                            obj.title + 
+                                            '</p><p><strong>Rating: </strong>' + 
+                                            obj.rating.toUpperCase() 
+                                        ),
+            download = $("<a>").attr({
+                                    "href": obj.imgURL,
+                                    "class": `btn btn-primary
+                                            btn-sm file-request`,
+                                    "download": '',
+                        }).html('<i class="fa fa-download"></i> Download');
+        wrapperDiv.append(
+                card.append(img).append(
+                    cardBody.append(cardText.append(download)
+                )
+            )
+        );
         return wrapperDiv;
     },
     buildAlert: function (keyword) {
@@ -122,12 +135,16 @@ $("body").on("click", ".giphy-link", function(event){
     }).done(function(results) {
         // console.log(results.type.gif);
         var data = results.data;
-        $("#giphy-images").empty();
         data.forEach(function(element){
-            var id = element['id'],
-                rating = element['rating'],
-                imgURL = element.images.fixed_height.url;
-            $("#giphy-images").append(app.buildImage(id, rating, imgURL));
+            var obj = { 
+                'id': element['id'],
+                'rating': element['rating'],
+                'title': element['title'],
+                'imgURLStill': element.images.fixed_height_still.url,
+                'imgURL': element.images.fixed_height.url,
+            };
+
+            $("#giphy-images").append(app.buildImage(obj));
         })
     }).fail(function(err) {
         throw err;
@@ -162,3 +179,8 @@ $("body").on("click", ".giphy-img", function(event){
         }
     })
 });
+
+// $("body").on("click", ".file-request", function(event){
+//     var url = $(this).attr("id");
+//     window.location = url;
+// });
