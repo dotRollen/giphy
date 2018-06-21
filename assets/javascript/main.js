@@ -7,7 +7,8 @@ const app = {
     ],
     buildImage: function (obj) {
         var  wrapperDiv = $('<div>').attr({
-                                "class": 'col-lg-4 col-md-6 col-sm-6 col-xs-12',
+                                "class": `animated fadeInUp col-lg-4 col-md-6 
+                                        col-sm-6 col-xs-12 giphy-card`,
                             }), 
             card = $('<div>').attr({
                                     'class': 'card',
@@ -45,7 +46,7 @@ const app = {
     },
     buildAlert: function () {
         var alertDiv = $('<div>').attr({
-                                "class": `alert alert-dismissible fade show`,
+                                "class": `animated shake alert alert-dismissible fade show`,
                                 "role": "alert",
                             }),
             alertBtn = $('<button>').attr({
@@ -135,6 +136,7 @@ $("body").on("click", ".giphy-link", function(event){
     }).done(function(results) {
         // console.log(results.type.gif);
         var data = results.data;
+        $("#giphy-images").empty();
         data.forEach(function(element){
             var obj = { 
                 'id': element['id'],
@@ -179,8 +181,3 @@ $("body").on("click", ".giphy-img", function(event){
         }
     })
 });
-
-// $("body").on("click", ".file-request", function(event){
-//     var url = $(this).attr("id");
-//     window.location = url;
-// });
